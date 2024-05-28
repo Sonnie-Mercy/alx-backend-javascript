@@ -12,11 +12,9 @@ export default function handleProfileSignup(firstName, lastName, fileName) {
         { status: photoStatus, value: photoPromise || 'Error' },
       ];
     })
-    .catch((error) => {
-      console.error('Error:', error.message);
-      return [
-        { status: 'rejected', value: error.message },
-        { status: 'rejected', value: error.message },
-      ];
-    });
+    // .catch((error) => { console.error('Error:', error.message);
+    //  return [
+    //    { status: 'rejected', value: error.message },
+    //    { status: 'rejected', value: error.message },
+    //  ];
 }
