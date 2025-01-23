@@ -1,79 +1,61 @@
-const request = require('request');
-const { expect } = require('chai');
-const app = require('./api');
+const request = require('supertest');
+const app = require('./api'); // Import the API
 
-// Server URL
-const baseUrl = 'http://localhost:7865';
-
-// Tests
 describe('API Integration Tests', () => {
+  let server;
+
   before((done) => {
-    app.listen(7865, () => {
-      console.log('Test server running on port 7865');
+    // Start server only once
+    server = app.listen(7865, () => {
       done();
+    }).on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        done(new Error('Port 7865 already in use'));
+      } else {
+        done(err);
+      }
     });
   });
 
-  // Test: GET /
-  describe('GET /', () => {
-    it('should return "Welcome to the payment system" and status 200', (done) => {
-      request.get(`${baseUrl}/`, (err, res, body) => {
-        expect(res.statusCode).to.equal(200);
-        expect(body).to.equal('Welcome to the payment system');
-        done();
-      });
-    });
+  after(() => {
+    // Close the server after all tests
+    server.close();
   });
 
-  // Test: GET /cart/:id
-  describe('GET /cart/:id', () => {
-    it('should return "Payment methods for cart :id" for valid id', (done) => {
-      request.get(`${baseUrl}/cart/12`, (err, res, body) => {
-        expect(res.statusCode).to.equal(200);
-        expect(body).to.equal('Payment methods for cart 12');
-        done();
-      });
-    });
-
-    it('should return 404 for invalid id', (done) => {
-      request.get(`${baseUrl}/cart/hello`, (err, res, body) => {
-        expect(res.statusCode).to.equal(404);
-        done();
-      });
-    });
+  it('GET / returns correct response', (done) => {
+    request(app)
+      .get('/')
+      .expect(200, 'Welcome to the payment system', done);
   });
 
-  // Test: GET /available_payments
-  describe('GET /available_payments', () => {
-    it('should return correct payment methods JSON', (done) => {
-      request.get(`${baseUrl}/available_payments`, (err, res, body) => {
-        expect(res.statusCode).to.equal(200);
-        const expectedResponse = {
-          payment_methods: {
-            credit_cards: true,
-            paypal: false,
-          },
-        };
-        expect(JSON.parse(body)).to.deep.equal(expectedResponse);
-        done();
-      });
-    });
+  it('GET /cart/:id with valid id returns correct response', (done) => {
+    request(app)
+      .get('/cart/12')
+      .expect(200, 'Payment methods for cart 12', done);
   });
 
-  // Test: POST /login
-  describe('POST /login', () => {
-    it('should return "Welcome :username" for valid username', (done) => {
-      request.post(
-        {
-          url: `${baseUrl}/login`,
-          json: { userName: 'Betty' },
+  it('GET /cart/:id with invalid id returns 404', (done) => {
+    request(app)
+      .get('/cart/abc')
+      .expect(404, done);
+  });
+
+  it('GET /available_payments returns correct response', (done) => {
+    request(app)
+      .get('/available_payments')
+      .expect(200, {
+        payment_methods: {
+          credit_cards: true,
+          paypal: false,
         },
-        (err, res, body) => {
-          expect(res.statusCode).to.equal(200);
-          expect(body).to.equal('Welcome Betty');
-          done();
-        }
-      );
-    });
+      }, done);
+  });
+
+  it('POST /login with username returns correct response', (done) => {
+    request(app)
+      .post('/login')
+      .send({ userName: 'Betty' })
+      .set('Content-Type', 'application/json')
+      .expect(200, 'Welcome Betty', done);
   });
 });

@@ -1,44 +1,39 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-
 const app = express();
-const port = 7865;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
-// Route: GET /
 app.get('/', (req, res) => {
-  res.status(200).send('Welcome to the payment system');
+  res.send('Welcome to the payment system');
 });
 
-// Route: GET /cart/:id
-app.get('/cart/:id', (req, res) => {
+app.get('/cart/:id(\\d+)', (req, res) => {
   const id = req.params.id;
-  if (isNaN(id)) {
-    return res.status(404).send('Not Found');
-  }
-  res.status(200).send(`Payment methods for cart ${id}`);
+  res.send(`Payment methods for cart ${id}`);
 });
 
-// Route: GET /available_payments
 app.get('/available_payments', (req, res) => {
-  res.status(200).json({
+  res.json({
     payment_methods: {
       credit_cards: true,
-      paypal: false,
-    },
+      paypal: false
+    }
   });
 });
 
-// Route: POST /login
 app.post('/login', (req, res) => {
   const { userName } = req.body;
-  res.status(200).send(`Welcome ${userName}`);
+  if (userName) {
+    res.send(`Welcome ${userName}`);
+  } else {
+    res.status(400).send('Username is missing');
+  }
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`API available on localhost port ${port}`);
-});
+if (require.main === module) {
+  app.listen(7865, () => {
+    console.log('API available on localhost port 7865');
+  });
+}
 
 module.exports = app;
