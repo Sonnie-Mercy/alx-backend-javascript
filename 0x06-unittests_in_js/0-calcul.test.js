@@ -1,20 +1,22 @@
 const assert = require('assert');
 const calculateNumber = require('./0-calcul');
 
-describe('calculateNumber', () => {
-  it('should return the sum of rounded numbers', () => {
-    assert.strictEqual(calculateNumber(1, 3), 4);
-    assert.strictEqual(calculateNumber(1, 3.7), 5);
-    assert.strictEqual(calculateNumber(1.2, 3.7), 5);
-    assert.strictEqual(calculateNumber(1.5, 3.7), 6);
+describe('Test calculateNumber function', function () {
+  it('calculateNumber should retrun rounded positive sum', function () {
+    assert.strictEqual(calculateNumber(2, 5), 7);
+    assert.strictEqual(calculateNumber(6.1, 6.1), 12);
+    assert.strictEqual(calculateNumber(5.9, 1.1), 7);
+    assert.strictEqual(calculateNumber(0.1, 0.2), 0);
+    assert.strictEqual(calculateNumber(0.8, 0.1), 1);
   });
-
-  it('should handle negative numbers', () => {
-    assert.strictEqual(calculateNumber(-1.5, -2.7), -4);
+  it('calculateNumber should retrun rounded negative sum', function () {
+    assert.strictEqual(calculateNumber(-2, -3), -5);
+    assert.strictEqual(calculateNumber(-4.1, -4.2), -8);
+    assert.strictEqual(calculateNumber(-1.6, -4.2), -6);
+    assert.strictEqual(calculateNumber(-0.2, -0.1), -0);
+    assert.strictEqual(calculateNumber(-0.8, -0.1), -1);
   });
-
-  it('should handle edge cases with 0', () => {
-    assert.strictEqual(calculateNumber(0, 0), 0);
-    assert.strictEqual(calculateNumber(0, 4.5), 5);
+  it('calculateNumber should retrun typeof number', function () {
+    assert.equal(typeof calculateNumber(3, 4), 'number');
   });
 });
