@@ -1,39 +1,44 @@
-// api.js
-
 const express = require('express');
+const bodyParser = require('body-parser');
+
 const app = express();
+const port = 7865;
 
-// Middleware to parse JSON bodies
-app.use(express.json());
+app.use(bodyParser.json());
 
-// Existing GET /cart/:id route
-app.get('/cart/:id', (req, res) => {
-  const cartId = req.params.id;
-  if (isNaN(cartId)) {
-    return res.status(404).send('Not Found');
-  }
-  return res.send(`Payment methods for cart ${cartId}`);
+// Route: GET /
+app.get('/', (req, res) => {
+  res.status(200).send('Welcome to the payment system');
 });
 
-// New GET /available_payments route
+// Route: GET /cart/:id
+app.get('/cart/:id', (req, res) => {
+  const id = req.params.id;
+  if (isNaN(id)) {
+    return res.status(404).send('Not Found');
+  }
+  res.status(200).send(`Payment methods for cart ${id}`);
+});
+
+// Route: GET /available_payments
 app.get('/available_payments', (req, res) => {
-  res.json({
+  res.status(200).json({
     payment_methods: {
       credit_cards: true,
-      paypal: false
-    }
+      paypal: false,
+    },
   });
 });
 
-// New POST /login route
+// Route: POST /login
 app.post('/login', (req, res) => {
   const { userName } = req.body;
-  res.send(`Welcome ${userName}`);
+  res.status(200).send(`Welcome ${userName}`);
 });
 
-// Start the server on port 7865
-app.listen(7865, () => {
-  console.log('API available on localhost port 7865');
+// Start the server
+app.listen(port, () => {
+  console.log(`API available on localhost port ${port}`);
 });
 
 module.exports = app;
